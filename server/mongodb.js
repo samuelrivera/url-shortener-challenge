@@ -12,5 +12,6 @@ const uri = `mongodb://${Mongo.HOST}:${Mongo.PORT}/${Mongo.NAME}`;
 }
  */
 const db = mongoose.createConnection(uri);
+db.on('error', console.error.bind(console, 'Database connection error:'));
 
 module.exports = db;

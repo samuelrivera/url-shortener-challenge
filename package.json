@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -13,7 +14,7 @@
     "dotenv": "^4.0.0",
     "express": "^4.16.2",
     "mongoose": "^4.12.3",
-    "uuid": "^3.1.0",
+    "shortid": "^2.2.8",
     "valid-url": "^1.0.9"
   },
   "eslintConfig": {
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "eslint": "^4.9.0",
-    "eslint-plugin-node": "^5.2.0"
+    "eslint-plugin-node": "^5.2.0",
+    "nodemon": "^1.12.1"
   }
 }

@@ -31,4 +31,9 @@ app.use(function (err, req, res, next) {
   });
 });
 
+// catch uncaughtException to avoid stopping the node service
+process.on('uncaughtException', (err) => {
+  console.error('uncaughtException: ', err);
+});
+
 module.exports = app;

@@ -1,4 +1,4 @@
-const uuidv4 = require('uuid/v4');
+const shortid = require('shortid');
 const { domain } = require('../../environment');
 const SERVER = `${domain.protocol}://${domain.host}`;
 
@@ -20,21 +20,21 @@ async function getUrl(hash) {
 /**
  * Generate an unique hash-ish- for an URL.
  * TODO: Deprecated the use of UUIDs.
- * TODO: Implement a shortening algorithm
+ * TODO: Implement a shortening algorithm.
+ * DONE: Replacing UUID library for shortid library solved the shortening
  * @param {string} id
  * @returns {string} hash
  */
 function generateHash(url) {
-  // return uuidv5(url, uuidv5.URL);
-  return uuidv4();
+  return shortid.generate();
 }
 
 /**
  * Generate a random token that will allow URLs to be (logical) removed
- * @returns {string} uuid v4
+ * @returns {string} hash
  */
 function generateRemoveToken() {
-  return uuidv4();
+  return shortid.generate();
 }
 
 /**
@@ -69,11 +69,20 @@ async function shorten(url, hash) {
     hash,
     isCustom: false,
     removeToken,
-    active: true
+    active: true,
+    visits: 0
   });
 
   const saved = await shortUrl.save();
   // TODO: Handle save errors
+  // TRY and CATCH in the POST route is handling the errors.
+  /* Also, we can add the following callback in the save method to handle errors:
+      const saved = await shortUrl.save((err) => {  
+        if (err) {
+          res.status(500).send(err);
+        }
+      });
+  */
 
   return {
     url,
@@ -86,11 +95,32 @@ async function shorten(url, hash) {
 
 /**
  * Validate URI
- * @param {any} url
+ * @param {any} hash
  * @returns {boolean}
  */
 function isValid(url) {
   return validUrl.isUri(url);
+}
+
+/**
+ * Register visit
+ * @param {string} hash
+ * @returns {object}
+ */
+async function registerVisit(hash) {
+  let updated = await UrlModel.update({ hash }, { $inc: { visits: 1 } });
+  return updated;
+}
+
+/**
+ * Remove URL
+ * @param {string} hash
+ * @param {string} removeToken
+ * @returns {object}
+ */
+async function removeUrl(hash, removeToken) {
+  let removed = await UrlModel.remove({ hash, removeToken });
+  return removed;
 }
 
 module.exports = {
@@ -98,5 +128,7 @@ module.exports = {
   getUrl,
   generateHash,
   generateRemoveToken,
-  isValid
+  isValid,
+  registerVisit,
+  removeUrl
 }
